@@ -1,0 +1,14 @@
+{
+    "name": "ab/devel-quality-tests",
+    "description": "Doctrine and Slevomat test files for coding standards for use in code-quality-check generation scripts.",
+    "type": "library",
+    "license": "Various; See Doctrine & Slevomat",
+    "authors": [
+        {
+            "name": "Not A.B. Carroll - See Slevomat & Doctrine Authors",
+            "email": "ben@hl9.net"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
