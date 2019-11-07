@@ -1,0 +1,75 @@
+#!/bin/bash
+
+#
+#  _   _ ___  ___    __ _| |_    _____      ___ __    _ __(_)___| | __
+# | | | / __|/ _ \  / _` | __|  / _ \ \ /\ / / '_ \  | '__| / __| |/ /
+# | |_| \__ \  __/ | (_| | |_  | (_) \ V  V /| | | | | |  | \__ \   < 
+#  \__,_|___/\___|  \__,_|\__|  \___/ \_/\_/ |_| |_| |_|  |_|___/_|\_\
+#                                                                    
+#    ..... And remove the following line to continue...
+
+printf "%s%s%s" "$(tput setaf 1)" "$(cat update | head -n 10 | tail -n 8)" "$(tput sgr0)"
+
+exit 1
+
+set +x
+
+gclone() { 
+  tmp="clone-tmp"
+
+  url="$1"
+  shift
+
+  dest="$1"
+  shift
+
+  echo $(tput setaf 4)"URL=$url"$(tput sgr0)
+  echo $(tput setaf 4)"dest=$dest"$(tput sgr0)
+
+  rm -rf -- "$tmp"
+  rm -rf -- "$dest"
+
+  echo git clone "$url" "$tmp"
+  git clone "$url" "$tmp"
+
+  mkdir -- "$dest"
+  printf "Revision: %s\n" $(cat $tmp/.git/refs/heads/master) \
+    && printf "Updated: %s\n" "$(date "+%Y-%m-%d-%H-%M-%S %s")" \
+    && printf "URL: $url\n\n" \
+    | tee "$dest/version"
+
+	while [ "$1" != "" ] && [ "$2" != "" ]; do
+    lsrc="$tmp/$1"
+    shift
+    ldest="$dest/$1"
+    shift
+
+    if [[ ! -d "$lsrc" ]]; then
+      printf $(tput setaf 1)"Something went horribly wrong... %s does not exist"$(tput sgr0) "$lsrc"
+    fi
+
+    basepath=$(dirname "$ldest")
+    if test ! -d "$basepath"; then
+      echo mkdir "$basepath"
+      mkdir "$basepath"
+    fi
+
+    cp -pR "$lsrc" "$ldest"
+  done
+
+  printf $(tput setaf 2)"%s\n"$(tput sgr0) "Completed $url into $dest"
+  rm -rf -- "$tmp"
+  printf "\n\n"
+}
+
+gclone "https://github.com/slevomat/coding-standard.git" "slevomat" \
+  "tests/Helpers/data/" "data/"
+
+mkdir doctrine/tests/
+gclone "https://github.com/doctrine/coding-standard.git" "doctrine" \
+  "tests/fixed/" "fixed/" "tests/input/" "input/"
+
+echo "Done"
+
+
+
